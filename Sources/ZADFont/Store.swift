@@ -120,14 +120,16 @@ final class Store: ObservableObject {
             let families = FontKit.families(from: faces)
             let active = Set(faces.map(\.url).filter(FontKit.isActive).map(\.path))
             let downloaded = Set((try? FileManager.default.contentsOfDirectory(atPath: google.path)) ?? [])
+            let folderTrees = trees
+            let faceCount = faces.count
             await MainActor.run {
                 guard id == self.scanID else { return }
                 self.families = families
-                self.folderTrees = trees
+                self.folderTrees = folderTrees
                 self.activeFiles = active
                 self.googleDownloaded = downloaded
                 self.scanning = false
-                self.message = "\(families.count) family, \(faces.count) kiểu chữ, \(active.count) file đang bật."
+                self.message = "\(families.count) family, \(faceCount) kiểu chữ, \(active.count) file đang bật."
             }
         }
     }

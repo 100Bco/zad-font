@@ -39,19 +39,24 @@ Session Claude Code chạy trên cloud (Linux), không build được app Mac. M
 
 ## Hiện trạng
 
-- `Package.swift`: tools 5.9, macOS 13+, 1 executableTarget `ZADFont`
-- `Sources/ZADFont/main.swift`: app thử bước 1. Có nút chọn 1 file font, công tắc bật/tắt bằng CoreText và dòng xem trước "Hội tụ tinh hoa chữ Việt"
-- `build.sh`: build release, đóng gói `build/ZAD Font.app`, ký ad-hoc
-- Lần build đầu trên Mac của Minh báo lỗi `cannot assign to property: 'self' is immutable` ở `main.swift`. Đã sửa (chưa build lại để kiểm chứng): đổi biến `log` thành `status`, đổi `set: setActive` thành `set: { setActive($0) }`, so sánh scope bằng `CTFontManagerScope.none`.
+- Nhánh `full-app` có bản đầy đủ bước 2 đến 6 (build xanh trên GitHub, Minh chưa mở thử). `main` vẫn là bản thử bước 1.
+- `Sources/ZADFont/`:
+  - `main.swift`: khai báo app, cửa sổ, phím tắt Cmd+O thêm thư mục.
+  - `FontKit.swift`: hàm CoreText thuần (quét file, nhóm family, kiểm dấu tiếng Việt, phân loại, OpenType đọc từ bảng GSUB, trục variable, bảng ký tự, bật/tắt `.persistent`, luật gợi ý cặp).
+  - `GoogleFonts.swift`: danh sách lấy từ `fonts.google.com/metadata/fonts`, file .ttf lấy link qua `fonts.googleapis.com/css2` (không cần API key, đã kiểm chứng 25/11/2026).
+  - `Store.swift`: trạng thái app, lưu `library.json` (thư mục theo dõi, yêu thích, collection, tag) trong `~/Library/Application Support/ZAD Font`. Google Fonts tải về `.../ZAD Font/Google Fonts/<Family>/`, bản xem trước cache ở `~/Library/Caches/ZAD Font/Google Preview`.
+  - `Views.swift`, `DetailViews.swift`: giao diện ba cột, thẻ font, Google Fonts, chi tiết, so sánh, gợi ý cặp.
+- `build.sh`: build release, đóng gói, ký ad-hoc. `bash build.sh install` chép thêm vào `/Applications`.
+- Bước 1 (Illustrator có nhận font bật bằng `.persistent` không) vẫn chưa kiểm tra.
 
 ## Kế hoạch các bước
 
-1. **(đang làm)** Build app thử, chọn 1 font chưa cài, bật lên, mở Illustrator 2026 kiểm tra font có trong menu không. Nếu Adobe không nhận font đăng ký bằng `.persistent` thì tìm cách khác trước khi đi tiếp.
-2. Thư viện: thư mục theo dõi, giữ nguyên cấu trúc thư mục, nhóm font theo family. Xem trước bằng chữ tự gõ, kéo cỡ chữ, xem dạng lưới, danh sách hoặc waterfall.
+1. **(chờ kiểm tra Illustrator)** Build app thử, chọn 1 font chưa cài, bật lên, mở Illustrator 2026 kiểm tra font có trong menu không. Nếu Adobe không nhận font đăng ký bằng `.persistent` thì tìm cách khác trước khi đi tiếp.
+2. **(đã code, chờ Minh thử)** Thư viện: thư mục theo dõi, giữ nguyên cấu trúc thư mục, nhóm font theo family. Xem trước bằng chữ tự gõ, kéo cỡ chữ, xem dạng lưới, danh sách hoặc waterfall.
 3. Bật/tắt theo font, family hoặc collection. Collection, tag, yêu thích lưu bằng JSON trong `~/Library/Application Support/ZAD Font`.
 4. Chi tiết font: kéo trục variable, bật/tắt tính năng OpenType, bảng ký tự. So sánh 2 đến 4 font.
 5. Google Fonts (duyệt, tải, bật). Lọc font có đủ dấu tiếng Việt bằng cách kiểm cmap với ạ ơ ư đ ỗ ằ ể ự ộ ỹ. Gợi ý cặp font theo phân loại font, chạy ngay trên máy (app ngoài không dùng được Claude).
-6. Đóng gói vào `/Applications`, kiểm tra lại từng tính năng.
+6. **(đã code, chờ Minh thử)** Bước 3 đến 5 cũng vậy. Đóng gói vào `/Applications`, kiểm tra lại từng tính năng.
 
 **Bản 2:** tự bật font khi mở file trong Adobe qua plugin (InDesign/Photoshop dùng UXP, Illustrator có thể phải dùng CEP, cần kiểm tra), tìm font thiếu trong file .ai/.pdf, phát hiện font trùng, dùng chung font cho team qua thư mục Drive đã sync.
 
