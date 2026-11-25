@@ -1,0 +1,19 @@
+name: Build ZAD Font
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build app
+        run: bash build.sh
+      - name: Zip app
+        run: ditto -c -k --keepParent "build/ZAD Font.app" ZAD-Font.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ZAD-Font
+          path: ZAD-Font.zip
