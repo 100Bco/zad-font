@@ -22,7 +22,7 @@ cat > "$APP/Contents/Info.plist" <<'PLIST'
   <key>CFBundleIdentifier</key><string>com.zad.font</string>
   <key>CFBundleName</key><string>ZAD Font</string>
   <key>CFBundlePackageType</key><string>APPL</string>
-  <key>CFBundleShortVersionString</key><string>0.1</string>
+  <key>CFBundleShortVersionString</key><string>0.2</string>
   <key>LSMinimumSystemVersion</key><string>13.0</string>
   <key>NSHighResolutionCapable</key><true/>
 </dict>
@@ -31,4 +31,13 @@ PLIST
 
 codesign --force -s - "$APP"
 echo "== Xong: $APP =="
+
+# bash build.sh install: chép app vào /Applications
+if [ "$1" = "install" ]; then
+  rm -rf "/Applications/ZAD Font.app"
+  ditto "$APP" "/Applications/ZAD Font.app"
+  APP="/Applications/ZAD Font.app"
+  echo "== Đã cài vào $APP =="
+fi
+
 if [ -z "$CI" ]; then open "$APP"; fi
